@@ -1,5 +1,5 @@
-import {InvalidArgumentError, NotInstanceOfClassError} from "../errors/ClassErrors";
-import Storage from "./Storage";
+import {InvalidArgumentError, NotInstanceOfClassError} from "../errors/ClassErrors.js";
+import Storage from "./Storage.js";
 
 export default class Category {
 
@@ -13,6 +13,15 @@ export default class Category {
 
   get id() {
     return this.#id;
+  }
+
+  #setId(id) {
+
+    if (!id?.trim()) {
+      throw new InvalidArgumentError('Category id cannot be empty!');
+    }
+
+    this.#id = id;
   }
 
   get name() {
@@ -31,19 +40,25 @@ export default class Category {
   static create(name) {
     const categoryInStorage = Storage.createCategory(new Category(name));
 
-    return structuredClone(categoryInStorage);
+    return Category.clone(categoryInStorage);
   }
 
   static update(category) {
     const categoryInStorage = Storage.updateCategory(category);
 
-    return structuredClone(categoryInStorage);
+    return Category.clone(categoryInStorage);
   }
 
   static remove(category) {
     const categoryInStorage = Storage.removeCategory(category);
 
-    return structuredClone(categoryInStorage);
+    return Category.clone(categoryInStorage);
+  }
+
+  static getByName(name) {
+    const categoryInStorage = Storage.findCategoryByName(name);
+
+    return Category.clone(categoryInStorage);
   }
 
   static validate(category) {
@@ -55,5 +70,17 @@ export default class Category {
     if (!category.name?.trim()) {
       throw new InvalidArgumentError('Some of the required fields (name) have invalid values!');
     }
+  }
+
+  static clone(category) {
+
+    if (!(category instanceof Category)) {
+      throw new NotInstanceOfClassError('The object is not an instance of Category!');
+    }
+
+    const cloneCategory = new Category(category.name);
+    cloneCategory.#setId(category.id);
+
+    return cloneCategory;
   }
 }

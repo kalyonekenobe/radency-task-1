@@ -1,23 +1,33 @@
-import Note from './Note';
-import Category from "./Category";
-import {NotInstanceOfClassError} from "../errors/ClassErrors";
-import {StorageItemAlreadyExistsError, StorageItemNotFoundError} from "../errors/StorageErrors";
+import Note from './Note.js';
+import Category from "./Category.js";
+import {InvalidArgumentError, NotInstanceOfClassError} from "../errors/ClassErrors.js";
+import {StorageItemAlreadyExistsError, StorageItemNotFoundError} from "../errors/StorageErrors.js";
 
 export default class Storage {
 
-  #notes = []
-  #categories = []
+  static #notes = []
+  static #categories = []
 
   static init() {
+    const taskCategory = Category.create('Task');
+    const randomThoughtCategory = Category.create('Random Thought');
+    const ideaCategory = Category.create('Idea');
 
+    Note.create('The content for the first note', taskCategory);
+    Note.create('The content for the second note', taskCategory);
+    Note.create('The content for the third note', randomThoughtCategory);
+    Note.create('The content for the fourth note', ideaCategory);
+    Note.create('The content for the fifth note', taskCategory);
+    Note.create('The content for the sixth note', ideaCategory);
+    Note.create('The content for the seventh note', randomThoughtCategory);
   }
 
   static get notes() {
-    return this.#notes;
+    return Storage.#notes;
   }
 
   static get categories() {
-    return this.#categories;
+    return Storage.#categories;
   }
 
   static createNote(note) {
@@ -70,7 +80,7 @@ export default class Storage {
       throw new NotInstanceOfClassError('The object is not an instance of Note!');
     }
 
-    let noteInStorage = Storage.notes?.find(noteItem => noteItem.id === note.id);
+    let noteInStorage = Storage.notes.find(noteItem => noteItem.id === note.id);
 
     if (!noteInStorage) {
       throw new StorageItemNotFoundError('The note with such id was not found in the storage!');
@@ -128,10 +138,25 @@ export default class Storage {
       throw new NotInstanceOfClassError('The object is not an instance of Category!');
     }
 
-    let categoryInStorage = Storage.categories?.find(categoryItem => categoryItem.id === category.id);
+    let categoryInStorage = Storage.categories.find(categoryItem => categoryItem.id === category.id);
 
     if (!categoryInStorage) {
       throw new StorageItemNotFoundError('The category with such id was not found in the storage!');
+    }
+
+    return categoryInStorage;
+  }
+
+  static findCategoryByName(name) {
+
+    if (!name?.trim()) {
+      throw new InvalidArgumentError('Category name cannot be empty!');
+    }
+
+    let categoryInStorage = Storage.categories.find(categoryItem => categoryItem.name === name);
+
+    if (!categoryInStorage) {
+      throw new StorageItemNotFoundError('The category with such name was not found in the storage!');
     }
 
     return categoryInStorage;
