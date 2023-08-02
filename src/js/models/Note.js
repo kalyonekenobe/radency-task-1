@@ -20,7 +20,7 @@ export default class Note {
     this.#category = category;
     this.#createdAt = Date.now();
     this.#isArchived = false;
-    this.#dates = content.toString().match(DATE_REGEX) ?? [];
+    this.#dates = content?.toString()?.match(DATE_REGEX) ?? [];
   }
 
   get id() {

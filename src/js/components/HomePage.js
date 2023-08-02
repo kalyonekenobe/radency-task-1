@@ -2,26 +2,24 @@ import CategoriesTable from "./CategoriesTable.js";
 import NotesTable from './NotesTable.js';
 import Builder from "../utils/classes/Builder.js";
 import Storage from "../utils/classes/Storage.js";
+import CreateNoteForm from "./CreateNoteForm.js";
 
 const HomePage = props => {
 
   const { notes, categories, showArchivedNotes = false } = props;
   const notesTable = NotesTable({ notes, showArchivedNotes });
   const categoriesTable = CategoriesTable({ categories });
+  const createNoteForm = CreateNoteForm(props);
 
   const children = [
     notesTable,
     categoriesTable,
+    createNoteForm
   ];
 
   const listenHomePageEvents = ({ notes, categories, showArchivedNotes } = {}) => {
 
-    const createNoteButton = document.querySelector('.button.create-note');
     const toggleArchivedNotesButton = document.querySelector('.button.toggle-archived-notes');
-
-    createNoteButton?.addEventListener('click', event => {
-      alert(1);
-    });
 
     toggleArchivedNotesButton?.addEventListener('click', event => {
 
@@ -39,6 +37,7 @@ const HomePage = props => {
   const toString = () => {
 
     return `
+      ${createNoteForm}
       <div class="container p-5">
         <h2 class="text-3xl font-bold my-5">Notes</h2>
         ${notesTable}
@@ -52,7 +51,7 @@ const HomePage = props => {
               `
               :
               `
-                <a class="button me-2 toggle-archived-notes bg-slate-900 hover:bg-slate-800 rounded-md cursor-pointer px-10 py-1 flex text-white font-semibold">
+                <a class="button me-2 toggle-archived-notes bg-slate-600 hover:bg-slate-500 rounded-md cursor-pointer px-10 py-1 flex text-white font-semibold">
                   Show archived notes
                 </a>
               `
@@ -72,7 +71,7 @@ const HomePage = props => {
     children: children,
     listenEvents: listenHomePageEvents,
     toString: toString
-  }
+  };
 };
 
 export default HomePage;

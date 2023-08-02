@@ -23,7 +23,13 @@ const createNotesTableRow = note => {
         
       </th>
       <td class="px-6 py-4 group-hover/note:text-emerald-500 group-[.archived]:bg-emerald-50">
-        ${new Date(note.createdAt).toLocaleDateString('en', { month: "long", day: "2-digit", year: "numeric" })}
+        ${
+          new Date(Number.parseInt(note.createdAt)).toLocaleDateString('en', { 
+            month: "long", 
+            day: "2-digit", 
+            year: "numeric" 
+          })
+        }
       </td>
       <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800 group-hover/note:text-emerald-500 group-[.archived]:bg-emerald-100">
         ${note.category.name}
@@ -94,12 +100,11 @@ const NotesTable = props => {
   const children = [];
 
   const updateDOM = () => {
-    let notes = Storage.fetchAllNotes();
-    let categories = Storage.fetchAllCategories().map(category => Category.getCategoryExtendedInfo(category));
-
+    const notes = Storage.fetchAllNotes();
     const notesTable = document.querySelector('.notes-table');
     Builder.render(NotesTable({ notes, showArchivedNotes }), notesTable);
 
+    const categories = Storage.fetchAllCategories().map(category => Category.getCategoryExtendedInfo(category));
     const categoriesTable = document.querySelector('.categories-table');
     Builder.render(CategoriesTable({ categories }), categoriesTable);
   };
@@ -186,7 +191,7 @@ const NotesTable = props => {
     children: children,
     listenEvents: listenNotesTableEvents,
     toString: toString,
-  }
+  };
 };
 
 export default NotesTable;
