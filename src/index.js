@@ -1,19 +1,10 @@
-import Storage from "./js/models/Storage.js";
-import Router from "./js/models/Router.js";
+import Storage from "./js/utils/classes/Storage.js";
+import Router from "./js/utils/classes/Router.js";
+import Builder from "./js/utils/classes/Builder.js";
+import homeRoutes from "./js/routes/home-routes.js";
 
 Storage.init();
-const router = new Router();
+Builder.init(document.querySelector('#root'));
 
-router.get('/', () => {
-  console.log(1);
-});
-
-router.get('/hello-world', () => {
-  let page = document.querySelector('#root');
-  page.innerHTML = `
-    <h1>Hello, world!</h1>
-  `
-});
-
-
+const router = Router.combineRouters(homeRoutes);
 router.init();

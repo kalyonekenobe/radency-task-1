@@ -1,28 +1,43 @@
-import Storage from './Storage.js'
-import {InvalidArgumentError, NotInstanceOfClassError} from "../errors/ClassErrors.js";
+import Storage from '../utils/classes/Storage.js'
+import {InvalidArgumentError, NotInstanceOfClassError} from "../errors/class-errors.js";
 import Category from "./Category.js";
-import {DATE_REGEX} from "../regex-strings.js";
+import {DATE_REGEX} from "../utils/regex-strings.js";
 
 export default class Note {
 
   #id
+  #name
   #content
   #category
   #dates
   #isArchived
   #createdAt
 
-  constructor(content, category) {
+  constructor(name, content, category) {
     this.#id = crypto.randomUUID();
+    this.#name = name;
     this.#content = content;
     this.#category = category;
     this.#createdAt = Date.now();
     this.#isArchived = false;
-    this.#dates = content.matchAll(DATE_REGEX);
+    this.#dates = content.toString().match(DATE_REGEX) ?? [];
   }
 
   get id() {
     return this.#id;
+  }
+
+  get name() {
+    return this.#name;
+  }
+
+  set name(value) {
+
+    if (!value?.trim()) {
+      throw new InvalidArgumentError('Note name cannot be empty!');
+    }
+
+    this.#name = value;
   }
 
   #setId(id) {
@@ -70,7 +85,7 @@ export default class Note {
 
   #setDates(dates) {
 
-    if (!dates || Array.isArray(dates)) {
+    if (!dates || !Array.isArray(dates)) {
       throw new InvalidArgumentError('Note "dates" property cannot be undefined and must be an array!');
     }
 
@@ -103,8 +118,8 @@ export default class Note {
     this.#createdAt = createdAt;
   }
 
-  static create(content, category) {
-    const noteInStorage = Storage.createNote(new Note(content, category));
+  static create(name, content, category) {
+    const noteInStorage = Storage.createNote(new Note(name, content, category));
 
     return Note.clone(noteInStorage);
   }
@@ -127,8 +142,8 @@ export default class Note {
       throw new NotInstanceOfClassError('The object is not an instance of Note!');
     }
 
-    if (!note.content?.trim() || !note.category || !(note.category instanceof Category)) {
-      throw new InvalidArgumentError('Some of the required fields (content, category) have invalid values!');
+    if (!note.name?.trim() || !note.content?.trim() || !note.category || !(note.category instanceof Category)) {
+      throw new InvalidArgumentError('Some of the required fields (name, content, category) have invalid values!');
     }
   }
 
@@ -142,6 +157,7 @@ export default class Note {
     cloneNote.#setId(note.id);
     cloneNote.#setCreatedAt(note.createdAt);
     cloneNote.#setDates(note.dates);
+    cloneNote.name = note.name;
     cloneNote.isArchived = note.isArchived;
 
     return cloneNote;

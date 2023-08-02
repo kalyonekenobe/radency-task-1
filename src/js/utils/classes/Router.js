@@ -1,3 +1,5 @@
+import {notFound} from "../../controllers/home-controller.js";
+
 export default class Router {
 
   #routes = new Map();
@@ -44,9 +46,9 @@ export default class Router {
     });
   }
 
-  navigate(url, failCallback = () => {}) {
+  navigate(url, failCallback = notFound) {
 
-    const options = this.#routes.get(url);
+    const options = this.routes.get(url);
 
     if (options) {
       const { method, action } = options
@@ -55,13 +57,29 @@ export default class Router {
         location.replace(url);
       }
 
-      action();
+      return action();
     }
 
-    failCallback();
+    return failCallback();
   }
 
   init() {
     this.navigate(location.pathname);
+  }
+
+  get routes() {
+    return this.#routes;
+  }
+
+  static combineRouters(...routers) {
+    const combinedRouter = new Router();
+
+    for (let router of routers) {
+      for (let [key, value] of router.routes) {
+        combinedRouter.routes.set(key, value);
+      }
+    }
+
+    return combinedRouter;
   }
 }

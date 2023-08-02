@@ -1,5 +1,5 @@
-import {InvalidArgumentError, NotInstanceOfClassError} from "../errors/ClassErrors.js";
-import Storage from "./Storage.js";
+import {InvalidArgumentError, NotInstanceOfClassError} from "../errors/class-errors.js";
+import Storage from "../utils/classes/Storage.js";
 
 export default class Category {
 
