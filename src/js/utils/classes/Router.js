@@ -64,7 +64,7 @@ export default class Router {
   }
 
   init() {
-    this.navigate(location.pathname);
+    this.navigate(location.pathname, notFound);
   }
 
   get routes() {
