@@ -61,6 +61,15 @@ export default class Category {
     return Category.clone(categoryInStorage);
   }
 
+  static getCategoryExtendedInfo(category) {
+    const categoryNotes = Storage.fetchCategoryNotes(category);
+    category.notes = categoryNotes;
+    category.archivedNotes = categoryNotes.filter(note => note.isArchived);
+    category.activeNotes = categoryNotes.filter(note => !note.isArchived);
+
+    return category;
+  }
+
   static validate(category) {
 
     if (!(category instanceof Category)) {

@@ -13,35 +13,55 @@ const createCategoriesTableRow = category => {
       </td>
     </tr>
   `;
-}
+};
 
 const createCategoriesTableBody = categories => {
 
   return categories.reduce((html, category) => html + createCategoriesTableRow(category), '')
-}
+};
 
-export default ({ categories }) => {
+const CategoriesTable = props => {
 
-  return `
-    <div class="relative overflow-x-auto sm:rounded-lg border border-slate-200 categories-table">
-      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase dark:text-gray-400 border-b">
-          <tr>
-            <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">
-              Note Category
-            </th>
-            <th scope="col" class="px-6 py-3">
-              Active
-            </th>
-            <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">
-              Archived
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          ${createCategoriesTableBody(categories)}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
+  const { categories } = props;
+  const children = [];
+
+  const listenCategoriesTableEvents = () => {
+
+    children.forEach(child => child.listenEvents?.(child.props));
+  };
+
+  const toString = () => {
+
+    return `
+      <div class="relative overflow-x-auto sm:rounded-lg border border-slate-200 categories-table">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+          <thead class="text-xs text-gray-700 uppercase dark:text-gray-400 border-b">
+            <tr>
+              <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">
+                Note Category
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Active
+              </th>
+              <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">
+                Archived
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            ${createCategoriesTableBody(categories)}
+          </tbody>
+        </table>
+      </div>
+    `;
+  };
+
+  return {
+    props: props,
+    children: children,
+    listenEvents: listenCategoriesTableEvents,
+    toString: toString,
+  };
+};
+
+export default CategoriesTable;

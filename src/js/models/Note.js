@@ -153,11 +153,10 @@ export default class Note {
       throw new NotInstanceOfClassError('The object is not an instance of Note!');
     }
 
-    const cloneNote = new Note(note.content, note.category);
+    const cloneNote = new Note(note.name, note.content, note.category);
     cloneNote.#setId(note.id);
     cloneNote.#setCreatedAt(note.createdAt);
     cloneNote.#setDates(note.dates);
-    cloneNote.name = note.name;
     cloneNote.isArchived = note.isArchived;
 
     return cloneNote;

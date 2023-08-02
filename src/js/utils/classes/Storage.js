@@ -2,6 +2,7 @@ import Note from '../../models/Note.js';
 import Category from "../../models/Category.js";
 import {InvalidArgumentError, NotInstanceOfClassError} from "../../errors/class-errors.js";
 import {StorageItemAlreadyExistsError, StorageItemNotFoundError} from "../../errors/storage-errors.js";
+import {DATE_REGEX} from "../regex-strings.js";
 
 export default class Storage {
 
@@ -14,12 +15,18 @@ export default class Storage {
     const ideaCategory = Category.create('Idea');
 
     Note.create('First note', 'The content for the first note', taskCategory);
-    Note.create('Second note', 'The content for the second note', taskCategory);
-    Note.create('Third note', 'I’m gonna have a dentist appointment on the 3/5/2021, I moved it from 5/5/2021', randomThoughtCategory);
+    let note2 = Note.create('Second note', 'The content for the second note', taskCategory);
+    let note3 = Note.create('Third note', 'I’m gonna have a dentist appointment on the 3/5/2021, I moved it from 5/5/2021', randomThoughtCategory);
     Note.create('Fourth note', 'The content for the fourth note', ideaCategory);
     Note.create('Fifth note', 'The content for the fifth note', taskCategory);
     Note.create('Sixth note', 'The content for the sixth note', ideaCategory);
     Note.create('Seventh note', 'The content for the seventh note', randomThoughtCategory);
+
+    note2.isArchived = true;
+    note3.isArchived = true;
+
+    Note.update(note2);
+    Note.update(note3);
   }
 
   static get notes() {
@@ -53,10 +60,10 @@ export default class Storage {
   static updateNote(note) {
     Note.validate(note);
     let noteInStorage = Storage.findNote(note);
-    noteInStorage = {
-      ...noteInStorage,
-      content: note.content,
-      category: note.category,
+
+    if (noteInStorage) {
+      noteInStorage = Note.clone(note);
+      Storage.#notes = Storage.notes.map(storageNote => storageNote.id === noteInStorage.id ? noteInStorage : storageNote);
     }
 
     return noteInStorage;
@@ -69,7 +76,7 @@ export default class Storage {
     }
 
     let noteInStorage = Storage.findNote(note);
-    Storage.notes.filter(noteItem => noteItem.id !== noteInStorage.id);
+    Storage.#notes = Storage.notes.filter(noteItem => noteItem.id !== noteInStorage.id);
 
     return noteInStorage;
   }
@@ -116,9 +123,10 @@ export default class Storage {
   static updateCategory(category) {
     Category.validate(category);
     let categoryInStorage = Storage.findCategory(category);
-    categoryInStorage = {
-      ...categoryInStorage,
-      name: category.name,
+
+    if (categoryInStorage) {
+      categoryInStorage = Category.clone(category);
+      Storage.#categories = Storage.notes.map(storageCategory => storageCategory.id === categoryInStorage.id ? categoryInStorage : storageCategory);
     }
 
     return categoryInStorage;
@@ -131,7 +139,7 @@ export default class Storage {
     }
 
     let categoryInStorage = Storage.findCategory(category);
-    Storage.categories.filter(categoryItem => categoryItem.id !== categoryInStorage.id);
+    Storage.#categories = Storage.categories.filter(categoryItem => categoryItem.id !== categoryInStorage.id);
 
     return categoryInStorage;
   }

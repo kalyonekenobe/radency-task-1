@@ -1,6 +1,6 @@
 export default class Builder {
 
-  static #defaultRootElement = document.querySelector('body');
+  static #defaultRootElement = document.querySelector('#root');
 
   static #rootElement
 
@@ -8,8 +8,17 @@ export default class Builder {
     Builder.#rootElement = rootElement;
   }
 
-  static render(content, node = Builder.#rootElement) {
-    node.innerHTML = content;
+  static render(renderedElement, node = Builder.#rootElement) {
+
+    if (node === Builder.#rootElement) {
+      node.innerHTML = renderedElement;
+    } else {
+      node.outerHTML = renderedElement;
+    }
+
+    renderedElement?.listenEvents?.(renderedElement.props);
     return this;
   }
+
+
 }
