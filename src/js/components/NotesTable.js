@@ -3,6 +3,7 @@ import Builder from "../utils/classes/Builder.js";
 import CategoriesTable from "./CategoriesTable.js";
 import Storage from "../utils/classes/Storage.js";
 import Category from "../models/Category.js";
+import EditNoteForm from "./EditNoteForm.js";
 
 const createNotesTableRow = note => {
 
@@ -99,7 +100,7 @@ const NotesTable = props => {
   const { notes, showArchivedNotes = false } = props;
   const children = [];
 
-  const updateDOM = () => {
+  const updateDOM = ({ showEditNoteForm = false, editNoteFormState = {} } = {}) => {
     const notes = Storage.fetchAllNotes();
     const notesTable = document.querySelector('.notes-table');
     Builder.render(NotesTable({ notes, showArchivedNotes }), notesTable);
@@ -107,44 +108,82 @@ const NotesTable = props => {
     const categories = Storage.fetchAllCategories().map(category => Category.getCategoryExtendedInfo(category));
     const categoriesTable = document.querySelector('.categories-table');
     Builder.render(CategoriesTable({ categories }), categoriesTable);
+
+    if (showEditNoteForm) {
+      const editNoteFormContainer = document.querySelector('.edit-note-form-container');
+      Builder.render(EditNoteForm({
+        ...props,
+        categories,
+        formState: editNoteFormState,
+        isVisible: showEditNoteForm,
+        showArchivedNotes
+      }), editNoteFormContainer);
+    }
   };
 
   const listenNotesTableEvents = props => {
 
     let { notes } = props;
     const archiveNoteButtons = document.querySelectorAll('.button.archive-note');
+    const editNoteButtons = document.querySelectorAll('.button.edit-note');
     const unarchiveNoteButtons = document.querySelectorAll('.button.unarchive-note');
     const removeNoteButtons = document.querySelectorAll('.button.remove-note');
 
     archiveNoteButtons.forEach(button => {
-      button.addEventListener('click', event => {
+      button.addEventListener('click', () => {
         const { noteId } = button.dataset;
         const note = notes.find(note => note.id === noteId);
 
         note.isArchived = true;
-        Note.update(note);
+
+        try {
+          Note.update(note);
+        } catch (error) {
+          alert(`Note archiving error: ${error}`);
+        }
+
         updateDOM();
       });
     });
 
     unarchiveNoteButtons.forEach(button => {
-      button.addEventListener('click', event => {
+      button.addEventListener('click', () => {
         const { noteId } = button.dataset;
         const note = notes.find(note => note.id === noteId);
 
         note.isArchived = false;
-        Note.update(note);
+
+        try {
+          Note.update(note);
+        } catch (error) {
+          alert(`Note unarchiving error: ${error}`);
+        }
+
         updateDOM();
       });
     });
 
     removeNoteButtons.forEach(button => {
-      button.addEventListener('click', event => {
+      button.addEventListener('click', () => {
         const { noteId } = button.dataset;
         const note = notes.find(note => note.id === noteId);
 
-        Note.remove(note);
+        try {
+          Note.remove(note);
+        } catch (error) {
+          alert(`Note removal error: ${error}`);
+        }
+
         updateDOM();
+      });
+    });
+
+    editNoteButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const {noteId} = button.dataset;
+        const note = notes.find(note => note.id === noteId);
+
+        updateDOM({ showEditNoteForm: true, editNoteFormState: note });
       });
     });
 

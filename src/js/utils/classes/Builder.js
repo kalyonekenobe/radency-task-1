@@ -1,6 +1,6 @@
 export default class Builder {
 
-  static #defaultRootElement = document.querySelector('#root');
+  static #defaultRootElement = document.querySelector('body');
 
   static #rootElement
 

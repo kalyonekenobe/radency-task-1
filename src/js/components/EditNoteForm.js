@@ -5,15 +5,16 @@ import CategoriesTable from "./CategoriesTable.js";
 import NotesTable from "./NotesTable.js";
 import Note from "../models/Note.js";
 
-const CreateNoteForm = props => {
+const EditNoteForm = props => {
 
   let {
     categories,
     showArchivedNotes = false,
     errors = [],
     isVisible = false,
-    formState = {}
+    formState = {},
   } = props;
+
   const children = [];
 
   const updateDOM = ({ isFormVisible, formState } = {}) => {
@@ -28,69 +29,67 @@ const CreateNoteForm = props => {
       Builder.render(CategoriesTable({ categories }), categoriesTable);
     }
 
-    const createNoteFormContainer = document.querySelector('.create-note-form-container');
-    return Builder.render(CreateNoteForm({
+    const editNoteFormContainer = document.querySelector('.edit-note-form-container');
+    return Builder.render(EditNoteForm({
       categories,
-      errors,
-      isVisible: isFormVisible,
+      errors, isVisible:
+      isFormVisible,
       formState,
       showArchivedNotes
-    }), createNoteFormContainer);
+    }), editNoteFormContainer);
   };
 
-  const listenCreateNoteFormEvents = props => {
-    const createNoteFormContainer = document.querySelector('.create-note-form-container');
-    const createNoteButton = document.querySelector('.button.create-note');
-    const submitCreateNoteFormButton = document.querySelector('.submit-create-note-form-button');
-    const closeCreateNoteFormButton = document.querySelector('.close-create-note-form-button');
+  const listenEditNoteFormEvents = props => {
+    const editNoteFormContainer = document.querySelector('.edit-note-form-container');
+    const submitEditNoteFormButton = document.querySelector('.submit-edit-note-form-button');
+    const closeEditNoteFormButton = document.querySelector('.close-edit-note-form-button');
 
-    closeCreateNoteFormButton?.addEventListener('click', event => {
-      createNoteFormContainer?.classList.add('hidden');
+    closeEditNoteFormButton?.addEventListener('click', event => {
+      editNoteFormContainer?.classList.add('hidden');
       errors = [];
       updateDOM({ isFormVisible: false });
     });
 
-    createNoteButton?.addEventListener('click', event => {
-      createNoteFormContainer?.classList.remove('hidden');
-      updateDOM({ isFormVisible: true });
-    });
-
-    submitCreateNoteFormButton?.addEventListener('click', event => {
+    submitEditNoteFormButton?.addEventListener('click', event => {
       event.preventDefault();
-      const form = document.querySelector('.create-note-form');
-      const { name, content, categoryId } = {
-        name: form?.name?.value,
-        content: form?.content?.value,
-        categoryId: form?.category?.value
-      };
-
+      const form = document.querySelector('.edit-note-form');
       errors = [];
 
-      if (!name?.trim()) {
-        errors = [...errors, 'Name cannot be empty!'];
-      }
+      try {
+        formState.name = form?.name?.value;
+        formState.content = form?.content?.value;
+        formState.categoryId = form?.category?.value;
 
-      if (!content?.trim()) {
-        errors = [...errors, 'Content cannot be empty!'];
-      }
+        if (!formState.name?.trim()) {
+          errors = [...errors, 'Name cannot be empty!'];
+        }
 
-      if (!categoryId) {
-        errors = [...errors, 'Choose category!'];
+        if (!formState.content?.trim()) {
+          errors = [...errors, 'Content cannot be empty!'];
+        }
+
+        if (!formState.categoryId) {
+          errors = [...errors, 'Choose category!'];
+        }
+
+      } catch (error) {
+        errors = [ ...errors, error];
       }
 
       if (errors?.length === 0) {
-        const category = Storage.fetchAllCategories().find(category => category.id === categoryId);
+        formState.category = Storage.fetchAllCategories().find(category => category.id === formState.categoryId);
+        const note = Note.clone(formState);
 
         try {
-          Note.create(name, content, category);
+          Note.update(note);
         } catch (error) {
-          alert(`Note creation error: ${error}`);
+          alert(`Note updating error: ${error}`);
         }
 
         form.reset();
       }
 
-      updateDOM({ isFormVisible: errors?.length > 0, formState: { name, content, categoryId } });
+      updateDOM({ isFormVisible: errors?.length > 0, formState });
     });
 
     children.forEach(child => child.listenEvents?.(child.props));
@@ -99,12 +98,12 @@ const CreateNoteForm = props => {
   const toString = () => {
 
     return `
-      <div class="relative z-10 create-note-form-container ${!isVisible ? `hidden` : ``}" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="relative z-10 edit-note-form-container ${!isVisible ? `hidden` : ``}" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
         <div class="fixed inset-0 z-10 overflow-y-auto">
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-              <form class="create-note-form">
+              <form class="edit-note-form">
                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                   <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
                     ${
@@ -125,7 +124,7 @@ const CreateNoteForm = props => {
                         :
                         ``
                     }
-                    <h3 class="text-base font-semibold leading-6 text-gray-900 text-xl mb-5" id="modal-title">Create note</h3>
+                    <h3 class="text-base font-semibold leading-6 text-gray-900 text-xl mb-5" id="modal-title">Edit note</h3>
                     <div class="mb-2">
                       <label for="name" class="text-slate-500 text-sm">Name: </label>
                       <input type="text" name="name" id="name" class="w-full border rounded-md mt-1 px-2 py-1 outline-none" value="${formState?.name ?? ''}">
@@ -140,7 +139,7 @@ const CreateNoteForm = props => {
                         ${
                           categories.map(category => {
                             return `
-                              <option value="${category.id}" ${category.id === formState?.categoryId ? `selected` : ``}>
+                              <option value="${category.id}" ${category.id === formState?.category?.id || category.id === formState.categoryId ? `selected` : ``}>
                                 ${category.name}
                               </option>
                             `;
@@ -151,8 +150,8 @@ const CreateNoteForm = props => {
                   </div>
                 </div>
                 <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                  <button type="button" class="outline-none submit-create-note-form-button inline-flex w-full justify-center rounded-md bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-400 sm:ml-3 sm:w-auto">Create</button>
-                  <button type="button" class="close-create-note-form-button mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+                  <button type="button" class="outline-none submit-edit-note-form-button inline-flex w-full justify-center rounded-md bg-yellow-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-400 sm:ml-3 sm:w-auto">Save</button>
+                  <button type="button" class="close-edit-note-form-button mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
                 </div>
               </form>
             </div>
@@ -165,9 +164,9 @@ const CreateNoteForm = props => {
   return {
     props: props,
     children: children,
-    listenEvents: listenCreateNoteFormEvents,
+    listenEvents: listenEditNoteFormEvents,
     toString: toString,
   };
 };
 
-export default CreateNoteForm;
+export default EditNoteForm;

@@ -60,6 +60,7 @@ export default class Note {
     }
 
     this.#content = value;
+    this.#dates = this.#content.toString()?.match(DATE_REGEX) ?? [];
   }
 
   get category() {
@@ -81,15 +82,6 @@ export default class Note {
 
   get dates() {
     return this.#dates;
-  }
-
-  #setDates(dates) {
-
-    if (!dates || !Array.isArray(dates)) {
-      throw new InvalidArgumentError('Note "dates" property cannot be undefined and must be an array!');
-    }
-
-    this.#dates = dates;
   }
 
   get isArchived() {
@@ -156,7 +148,6 @@ export default class Note {
     const cloneNote = new Note(note.name, note.content, note.category);
     cloneNote.#setId(note.id);
     cloneNote.#setCreatedAt(note.createdAt);
-    cloneNote.#setDates(note.dates);
     cloneNote.isArchived = note.isArchived;
 
     return cloneNote;

@@ -6,10 +6,10 @@ const createCategoriesTableRow = category => {
         ${category.name}
       </th>
       <td class="px-6 py-4 group-hover/category:text-emerald-500">
-        ${category.archivedNotes?.length}
+        ${category.activeNotes?.length}
       </td>
       <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800 group-hover/category:text-emerald-500">
-        ${category.activeNotes?.length}
+        ${category.archivedNotes?.length}
       </td>
     </tr>
   `;

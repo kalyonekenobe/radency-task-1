@@ -3,6 +3,7 @@ import NotesTable from './NotesTable.js';
 import Builder from "../utils/classes/Builder.js";
 import Storage from "../utils/classes/Storage.js";
 import CreateNoteForm from "./CreateNoteForm.js";
+import EditNoteForm from "./EditNoteForm.js";
 
 const HomePage = props => {
 
@@ -10,11 +11,13 @@ const HomePage = props => {
   const notesTable = NotesTable({ notes, showArchivedNotes });
   const categoriesTable = CategoriesTable({ categories });
   const createNoteForm = CreateNoteForm(props);
+  const editNoteForm = EditNoteForm(props);
 
   const children = [
     notesTable,
     categoriesTable,
-    createNoteForm
+    createNoteForm,
+    editNoteForm
   ];
 
   const listenHomePageEvents = ({ notes, categories, showArchivedNotes } = {}) => {
@@ -38,6 +41,7 @@ const HomePage = props => {
 
     return `
       ${createNoteForm}
+      ${editNoteForm}
       <div class="container p-5">
         <h2 class="text-3xl font-bold my-5">Notes</h2>
         ${notesTable}
