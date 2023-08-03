@@ -45,8 +45,8 @@ const CreateNoteForm = props => {
     const closeCreateNoteFormButton = document.querySelector('.close-create-note-form-button');
 
     closeCreateNoteFormButton?.addEventListener('click', event => {
-      createNoteFormContainer?.classList.add('hidden');
       errors = [];
+      createNoteFormContainer?.classList.add('hidden');
       updateDOM({ isFormVisible: false });
     });
 
