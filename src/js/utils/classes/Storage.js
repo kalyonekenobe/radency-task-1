@@ -15,14 +15,15 @@ export default class Storage {
       const taskCategory = Category.create('Task');
       const randomThoughtCategory = Category.create('Random Thought');
       const ideaCategory = Category.create('Idea');
+      const quoteCategory = Category.create('Quote');
 
-      Note.create('First note', 'The content for the first note', taskCategory);
-      Note.create('Second note', 'The content for the second note', taskCategory);
-      Note.create('Third note', 'I’m gonna have a dentist appointment on the 3/5/2021, I moved it from 5/5/2021', randomThoughtCategory);
-      Note.create('Fourth note', 'The content for the fourth note', ideaCategory);
-      Note.create('Fifth note', 'The content for the fifth note', taskCategory);
-      Note.create('Sixth note', 'The content for the sixth note', ideaCategory);
-      Note.create('Seventh note', 'The content for the seventh note', randomThoughtCategory);
+      Note.create('Shopping list', 'Tomatoes, bread', taskCategory);
+      Note.create('The theory of evolution', 'The evolution is the change in heritable characteristics of biological populations over successive generations.', randomThoughtCategory);
+      Note.create('New Feature', 'Implemented new feature on the 3/5/2021, I will send it for test on 5/5/2021', ideaCategory);
+      Note.create('William Gaddis', 'Power doesn\'t corrupt people, people corrupt power.', quoteCategory);
+      Note.create('Books', 'The Lean Startup', taskCategory);
+      Note.create('Health', 'I’m gonna have a dentist appointment on 08/03/2023', ideaCategory);
+      Note.create('Travelling', 'I would like to move to Norway', randomThoughtCategory);
     } catch (error) {
       alert(`Storage initialization error: ${error}`);
     }
